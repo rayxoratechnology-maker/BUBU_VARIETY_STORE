@@ -1,0 +1,469 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#f5b800">
+<title>BUBU VARIETY STORE | Billing & Khata</title>
+<style>
+:root{--yellow:#ffc400;--red:#d92323;--green:#16834a;--ink:#20252c;--muted:#667085;--card:rgba(255,255,255,.96)}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;color:var(--ink);min-height:100vh;background:linear-gradient(#0005,#0007),url("https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=1800&q=85") center/cover fixed}
+body.theme-gold{background:linear-gradient(135deg,#254b20,#b4a52c,#e8d88a) fixed}
+body.theme-dark{background:linear-gradient(135deg,#101827,#202d40) fixed;color:#f5f5f5}
+body.theme-gray{background:linear-gradient(135deg,#cbd0d6,#eef0f2) fixed}
+header{background:linear-gradient(110deg,#ffcf20,#ffed86);border-bottom:6px solid var(--red);padding:18px 14px;text-align:center;color:#171717;box-shadow:0 4px 18px #0005}
+.shop-odia{font-size:clamp(24px,5vw,38px);font-weight:900;margin:0 0 5px}
+.shop-name{font-size:clamp(22px,4vw,32px);font-weight:1000;letter-spacing:1px;margin:0;color:#b51d1d}
+.shop-meta{font-size:13px;line-height:1.6;margin-top:7px;font-weight:700}
+nav{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;padding:12px;background:#171717}
+nav button{border:1px solid #ffc400;background:#282828;color:white;padding:11px 17px;border-radius:25px;font-weight:700;cursor:pointer}
+nav button.active,nav button:hover{background:#ffc400;color:#171717}
+main{max-width:1100px;margin:22px auto;padding:0 12px 40px}
+.panel{background:var(--card);color:#20252c;border-radius:17px;padding:20px;margin-bottom:18px;box-shadow:0 8px 28px #0004;backdrop-filter:blur(12px)}
+body.theme-dark .panel{background:rgba(28,37,52,.97);color:#f5f5f5}
+h2{margin:0 0 16px;font-size:22px}
+h3{margin:15px 0 10px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+label{font-weight:700;font-size:13px}
+input,select,textarea{width:100%;padding:12px;border:1px solid #c9ced6;border-radius:9px;font-size:15px;background:#fff;color:#222;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid #ffc400;border-color:#d9a400}
+button{font-family:inherit}
+.btn{border:0;border-radius:9px;padding:12px 16px;font-size:14px;font-weight:800;cursor:pointer;background:#252a32;color:white}
+.btn:hover{filter:brightness(1.1)}
+.yellow{background:#ffc400;color:#171717}
+.red{background:#d92323;color:white}
+.green{background:#16834a;color:white}
+.blue{background:#1769aa;color:white}
+.gray{background:#e4e7ec;color:#222}
+.btn-small{padding:8px 11px;font-size:12px}
+.actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:14px}
+.item-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:620px}
+th,td{padding:9px 7px;border-bottom:1px solid #e4e7ec;text-align:left;font-size:13px}
+th{background:#fff2bd}
+td input,td select{padding:9px;font-size:13px}
+.amount{text-align:right;font-weight:800;white-space:nowrap}
+.total-box{max-width:420px;margin:16px 0 0 auto;background:#fff8db;border:1px solid #f1d46a;border-radius:12px;padding:14px;color:#222}
+.total-line{display:flex;justify-content:space-between;padding:5px 0}
+.grand{font-size:22px;color:#b51d1d;font-weight:1000;border-top:1px dashed #c4a53d;margin-top:6px;padding-top:10px}
+.qr-area{display:flex;align-items:center;gap:15px;flex-wrap:wrap;margin-top:15px;padding:12px;border:1px dashed #aaa;border-radius:12px}
+.qr-area img{width:150px;height:150px;object-fit:contain;background:white;padding:5px;border:1px solid #ddd}
+.hidden{display:none!important}
+.muted{color:var(--muted);font-size:13px}
+body.theme-dark .muted{color:#b8c2d2}
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:15px}
+.stat{background:#fff5cc;border-radius:12px;padding:15px;color:#222}
+.stat b{display:block;font-size:21px;color:#a31d1d;margin-top:6px}
+.bill-card{border:1px solid #ddd;border-radius:12px;padding:14px;margin:10px 0;background:#fff;color:#222}
+.bill-card p{margin:5px 0;font-size:13px}
+.paid{color:#16834a;font-weight:900}
+.pending{color:#c42a2a;font-weight:900}
+.status{display:inline-block;border-radius:20px;padding:4px 9px;background:#eee;font-size:11px;font-weight:800}
+footer{text-align:center;color:white;padding:18px;text-shadow:0 1px 4px #000}
+hr{border:0;border-top:1px solid #ddd;margin:16px 0}
+@media(max-width:650px){.grid{grid-template-columns:1fr}.panel{padding:15px}.stat-grid{grid-template-columns:1fr}.actions .btn{flex:1 1 45%}nav button{flex:1 1 28%;padding:10px 7px;font-size:12px}.shop-meta{font-size:11px}}
+@media print{
+ body{background:white!important;color:#000!important}
+ header,nav,footer,.no-print,#history,#settings,.actions,.qr-area{display:none!important}
+ main{margin:0;padding:0;max-width:none}
+ .panel{box-shadow:none;border:0;padding:0;background:white!important;color:#000!important}
+ #billing{display:block!important}
+ #billing .no-print{display:none!important}
+ #billing input,#billing select{border:0;padding:2px;background:white}
+ #billing table{min-width:0}
+ #billing th,#billing td{font-size:11px;padding:6px}
+ .total-box{border:1px solid #777}
+}
+</style>
+</head>
+<body>
+<header>
+  <p class="shop-odia">ବୁବୁ ଭେରାଇଟି ଷ୍ଟୋର</p>
+  <h1 class="shop-name">BUBU VARIETY STORE</h1>
+  <div class="shop-meta">
+    Palbani, Baripada, Mayurbhanj, Odisha, India<br>
+    GSTIN: 21AKOPJ9490R1Z8 | Mobile: 7205627144
+  </div>
+</header>
+
+<nav class="no-print">
+  <button class="active" data-tab="billing">🧾 New Bill</button>
+  <button data-tab="history">📊 Sales & Udhaar</button>
+  <button data-tab="settings">⚙️ Settings</button>
+</nav>
+
+<main>
+<section id="billing" class="panel">
+  <h2>🛒 Grocery Billing</h2>
+  <div class="grid">
+    <div class="field">
+      <label>Bill Number</label>
+      <input id="billNumber" readonly>
+    </div>
+    <div class="field">
+      <label>Bill Date</label>
+      <input id="billDate" type="date">
+    </div>
+  </div>
+
+  <h3>Customer Details</h3>
+  <div class="grid">
+    <div class="field">
+      <label>Mobile / WhatsApp Number *</label>
+      <input id="customerPhone" type="tel" inputmode="numeric" maxlength="10" placeholder="10-digit mobile number">
+    </div>
+    <div class="field">
+      <label>Customer Name</label>
+      <input id="customerName" placeholder="Customer name">
+    </div>
+    <div class="field">
+      <label>Email ID (Optional)</label>
+      <input id="customerEmail" type="email" placeholder="customer@email.com">
+    </div>
+    <div class="field">
+      <label>Payment Mode</label>
+      <select id="paymentMode">
+        <option value="Cash">Cash</option>
+        <option value="UPI">UPI</option>
+        <option value="Udhaar">Udhaar / Credit</option>
+      </select>
+    </div>
+  </div>
+
+  <hr>
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+    <h3>Item Details</h3>
+    <button class="btn yellow no-print" id="addItem">＋ Add Item</button>
+  </div>
+  <div class="item-wrap">
+    <table>
+      <thead>
+        <tr><th>Item Name</th><th>Rate ₹</th><th>Quantity</th><th>Unit</th><th>Amount ₹</th><th class="no-print">Delete</th></tr>
+      </thead>
+      <tbody id="itemRows"></tbody>
+    </table>
+  </div>
+  <datalist id="groceryItems">
+    <option value="Rice"><option value="Wheat Flour"><option value="Dal">
+    <option value="Sugar"><option value="Cooking Oil"><option value="Soap">
+    <option value="Tea"><option value="Salt"><option value="Potato">
+    <option value="Onion"><option value="Tomato"><option value="Milk">
+    <option value="Biscuits"><option value="Shampoo"><option value="Detergent">
+    <option value="Egg"><option value="Bread"><option value="Spices">
+    <option value="Noodles"><option value="Toothpaste"><option value="Chips">
+  </datalist>
+
+  <div class="total-box">
+    <div class="total-line"><span>Subtotal</span><b id="subtotal">₹0.00</b></div>
+    <div class="total-line" style="align-items:center"><label for="discount">Discount (₹)</label><input id="discount" type="number" min="0" step="0.01" value="0" style="width:120px;padding:7px"></div>
+    <div class="total-line grand"><span>Grand Total</span><span id="grandTotal">₹0.00</span></div>
+  </div>
+
+  <div id="qrArea" class="qr-area hidden">
+    <img id="upiQr" alt="UPI Payment QR Code">
+    <div>
+      <b>Scan & Pay</b>
+      <p id="qrAmount" style="font-size:20px;font-weight:900;color:#16834a;margin:8px 0">₹0.00</p>
+      <p id="qrUpi" class="muted"></p>
+      <small class="muted">QR is generated for this bill amount. Verify your UPI ID before accepting payment.</small>
+    </div>
+  </div>
+
+  <div class="actions no-print">
+    <button class="btn green" id="saveBill">💾 Save Bill</button>
+    <button class="btn blue" id="whatsapp">🟢 WhatsApp</button>
+    <button class="btn blue" id="sms">✉ SMS</button>
+    <button class="btn blue" id="email">📧 Email</button>
+    <button class="btn yellow" id="printBill">🖨 Print / PDF</button>
+    <button class="btn red" id="newBill">＋ New Bill / Clear</button>
+  </div>
+  <p id="billMessage" class="muted no-print" role="status"></p>
+</section>
+
+<section id="history" class="panel hidden">
+  <h2>📊 Sales Report & Udhaar Khata</h2>
+  <div class="stat-grid">
+    <div class="stat">Total Sales<b id="totalSales">₹0.00</b></div>
+    <div class="stat">Pending Udhaar<b id="pendingTotal">₹0.00</b></div>
+    <div class="stat">Total Bills<b id="billCount">0</b></div>
+  </div>
+  <div class="field">
+    <label>Search by customer name, phone or bill number</label>
+    <input id="historySearch" placeholder="Search bills...">
+  </div>
+  <div id="billHistory"></div>
+</section>
+
+<section id="settings" class="panel hidden">
+  <h2>⚙️ Store Settings</h2>
+  <div class="field">
+    <label>Your UPI ID</label>
+    <input id="upiId" placeholder="yourname@upi">
+    <small class="muted">Example: 9876543210@upi. Save the correct UPI ID to generate bill QR codes.</small>
+  </div>
+  <div class="field">
+    <label>Website Background Theme</label>
+    <select id="themeSelect">
+      <option value="grocery">Grocery Photo</option>
+      <option value="gold">Golden-Green Gradient</option>
+      <option value="dark">Dark Mode</option>
+      <option value="gray">Clean Gray</option>
+    </select>
+  </div>
+  <button class="btn yellow" id="saveSettings">Save Settings</button>
+  <p id="settingsMessage" class="muted"></p>
+  <hr>
+  <h3>Data & Backup Information</h3>
+  <p class="muted">Bills, customer names, UPI ID and settings are stored in this browser's localStorage. They are not automatically synced to another phone or browser. Clear browser data or uninstalling the browser may erase them.</p>
+  <button class="btn blue" id="exportData">⬇ Export Bills Backup (JSON)</button>
+</section>
+</main>
+
+<footer>
+  <b>BUBU VARIETY STORE</b><br>
+  Thank you for shopping with us!<br>
+  <small>Billing & Khata Application</small>
+</footer>
+
+<script>
+"use strict";
+
+const $ = id => document.getElementById(id);
+const STORE = {
+  bills: "bubu_store_bills_v1",
+  customers: "bubu_store_customers_v1",
+  counter: "bubu_store_counter_v1",
+  settings: "bubu_store_settings_v1"
+};
+
+const shop = {
+  odia: "ବୁବୁ ଭେରାଇଟି ଷ୍ଟୋର",
+  name: "BUBU VARIETY STORE",
+  address: "Palbani, Baripada, Mayurbhanj, Odisha, India",
+  gst: "21AKOPJ9490R1Z8",
+  mobile: "7205627144"
+};
+
+let bills = readStore(STORE.bills, []);
+let customers = readStore(STORE.customers, {});
+let settings = readStore(STORE.settings, {upi:"",theme:"grocery"});
+let billCounter = Number(localStorage.getItem(STORE.counter) || 101);
+let currentBillNo = billCounter;
+let savedCurrentBill = false;
+
+function readStore(key, fallback) {
+  try {
+    const value = JSON.parse(localStorage.getItem(key));
+    return value ?? fallback;
+  } catch {
+    return fallback;
+  }
+}
+function writeStore(key, value) {
+  localStorage.setItem(key, JSON.stringify(value));
+}
+function money(value) {
+  return "₹" + Number(value || 0).toFixed(2);
+}
+function today() {
+  const d = new Date();
+  return [d.getFullYear(),String(d.getMonth()+1).padStart(2,"0"),String(d.getDate()).padStart(2,"0")].join("-");
+}
+function escapeHTML(value) {
+  return String(value ?? "").replace(/[&<>"']/g, c => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[c]));
+}
+function applyTheme(theme) {
+  document.body.classList.remove("theme-gold","theme-dark","theme-gray");
+  if (theme === "gold") document.body.classList.add("theme-gold");
+  if (theme === "dark") document.body.classList.add("theme-dark");
+  if (theme === "gray") document.body.classList.add("theme-gray");
+}
+function showTab(name) {
+  ["billing","history","settings"].forEach(id => $(id).classList.toggle("hidden",id!==name));
+  document.querySelectorAll("nav button").forEach(btn => btn.classList.toggle("active",btn.dataset.tab===name));
+  if (name==="history") renderHistory();
+}
+document.querySelectorAll("nav button").forEach(btn => btn.addEventListener("click",()=>showTab(btn.dataset.tab)));
+
+function updateBillNumber() {
+  $("billNumber").value = "#" + currentBillNo;
+}
+function addItem(name="",rate="",qty="1",unit="kg") {
+  const tr = document.createElement("tr");
+  tr.innerHTML = `
+    <td><input class="item-name" list="groceryItems" placeholder="Item name" value="${escapeHTML(name)}"></td>
+    <td><input class="item-rate" type="number" min="0" step="0.01" placeholder="0.00" value="${escapeHTML(rate)}"></td>
+    <td><input class="item-qty" type="number" min="0" step="0.001" placeholder="1" value="${escapeHTML(qty)}"></td>
+    <td><select class="item-unit">
+      <option ${unit==="kg"?"selected":""}>kg</option>
+      <option ${unit==="gm"?"selected":""}>gm</option>
+      <option ${unit==="pcs"?"selected":""}>pcs</option>
+      <option ${unit==="pkt"?"selected":""}>pkt</option>
+      <option ${unit==="ltr"?"selected":""}>ltr</option>
+    </select></td>
+    <td class="amount item-amount">₹0.00</td>
+    <td class="no-print"><button type="button" class="btn red btn-small delete-item">✕</button></td>`;
+  $("itemRows").appendChild(tr);
+  tr.querySelectorAll("input,select").forEach(el => el.addEventListener("input",calculate));
+  tr.querySelector(".delete-item").addEventListener("click",()=>{tr.remove();calculate();});
+  calculate();
+}
+function getItems() {
+  return [...$("itemRows").querySelectorAll("tr")].map(tr => {
+    const name=tr.querySelector(".item-name").value.trim();
+    const rate=Number(tr.querySelector(".item-rate").value)||0;
+    const qty=Number(tr.querySelector(".item-qty").value)||0;
+    const unit=tr.querySelector(".item-unit").value;
+    return {name,rate,qty,unit,amount:rate*qty};
+  }).filter(item=>item.name && item.qty>0);
+}
+function getTotals() {
+  const items=getItems();
+  const subtotal=items.reduce((sum,item)=>sum+item.amount,0);
+  const discount=Math.max(0,Number($("discount").value)||0);
+  return {items,subtotal,discount,total:Math.max(0,subtotal-discount)};
+}
+function calculate() {
+  const totals=getTotals();
+  $("subtotal").textContent=money(totals.subtotal);
+  $("grandTotal").textContent=money(totals.total);
+  document.querySelectorAll("#itemRows tr").forEach(tr=>{
+    const rate=Number(tr.querySelector(".item-rate").value)||0;
+    const qty=Number(tr.querySelector(".item-qty").value)||0;
+    tr.querySelector(".item-amount").textContent=money(rate*qty);
+  });
+  updateQR(totals.total);
+}
+$("discount").addEventListener("input",calculate);
+$("addItem").addEventListener("click",()=>addItem());
+
+function updateQR(total) {
+  const upi=settings.upi.trim();
+  if(total<=0 || !upi) {
+    $("qrArea").classList.add("hidden");
+    return;
+  }
+  const amount=total.toFixed(2);
+  const uri=`upi://pay?pa=${encodeURIComponent(upi)}&pn=${encodeURIComponent(shop.name)}&am=${amount}&cu=INR&tn=${encodeURIComponent("Bill "+currentBillNo)}`;
+  $("upiQr").src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data="+encodeURIComponent(uri);
+  $("qrAmount").textContent=money(total);
+  $("qrUpi").textContent="UPI ID: "+upi;
+  $("qrArea").classList.remove("hidden");
+}
+$("customerPhone").addEventListener("input",()=>{
+  const phone=$("customerPhone").value.replace(/\D/g,"").slice(0,10);
+  $("customerPhone").value=phone;
+  if(phone.length===10 && customers[phone]) $("customerName").value=customers[phone].name || "";
+});
+$("customerPhone").addEventListener("blur",()=>{
+  const phone=$("customerPhone").value.trim();
+  if(phone.length===10 && customers[phone] && !$("customerName").value.trim()) {
+    $("customerName").value=customers[phone].name || "";
+  }
+});
+
+function validateBill() {
+  const phone=$("customerPhone").value.trim();
+  if(phone.length!==10 || !/^\d{10}$/.test(phone)) {
+    alert("Please enter a valid 10-digit customer mobile number.");
+    $("customerPhone").focus();return false;
+  }
+  if(getItems().length===0) {
+    alert("Please add at least one valid item with quantity.");
+    return false;
+  }
+  if(getTotals().total<=0) {
+    alert("Grand total must be greater than zero.");
+    return false;
+  }
+  return true;
+}
+function makeBill() {
+  const totals=getTotals();
+  return {
+    id:String(currentBillNo),
+    number:currentBillNo,
+    date:$("billDate").value || today(),
+    phone:$("customerPhone").value.trim(),
+    name:$("customerName").value.trim() || "Customer",
+    email:$("customerEmail").value.trim(),
+    mode:$("paymentMode").value,
+    items:totals.items,
+    subtotal:totals.subtotal,
+    discount:totals.discount,
+    total:totals.total,
+    upi:settings.upi,
+    paid:$("paymentMode").value!=="Udhaar",
+    createdAt:new Date().toISOString()
+  };
+}
+function saveBill() {
+  if(!validateBill()) return null;
+  const bill=makeBill();
+  if(savedCurrentBill) {
+    $("billMessage").textContent="This bill is already saved. Use New Bill to create the next bill.";
+    return bills.find(b=>b.id===bill.id) || bill;
+  }
+  if(bills.some(b=>b.id===bill.id)) {
+    alert("This bill number already exists. Please start a new bill.");
+    return null;
+  }
+  bills.unshift(bill);
+  writeStore(STORE.bills,bills);
+  customers[bill.phone]={name:bill.name,email:bill.email};
+  writeStore(STORE.customers,customers);
+  billCounter=currentBillNo+1;
+  localStorage.setItem(STORE.counter,String(billCounter));
+  savedCurrentBill=true;
+  $("billMessage").textContent="Bill #"+bill.number+" saved successfully!";
+  return bill;
+}
+$("saveBill").addEventListener("click",saveBill);
+
+function receiptText(bill) {
+  const lines=[
+    shop.odia,shop.name,shop.address,
+    "GSTIN: "+shop.gst,"Mobile: "+shop.mobile,
+    "--------------------------------",
+    "BILL NO: #"+bill.number,"Date: "+bill.date,
+    "Customer: "+bill.name,"Mobile: "+bill.phone,
+    "Payment: "+bill.mode,
+    "--------------------------------",
+    "ITEMS:"
+  ];
+  bill.items.forEach((item,i)=>{
+    lines.push(`${i+1}. ${item.name} - ${item.qty} ${item.unit} x ${money(item.rate)} = ${money(item.amount)}`);
+  });
+  lines.push(
+    "--------------------------------",
+    "Subtotal: "+money(bill.subtotal),
+    "Discount: "+money(bill.discount),
+    "GRAND TOTAL: "+money(bill.total),
+    "Payment Status: "+(bill.paid?"PAID":"PENDING UDHAAR"),
+    "UPI ID: "+(bill.upi || "Not configured"),
+    "--------------------------------",
+    "Thank you for shopping with us!",
+    shop.name
+  );
+  return lines.join("\n");
+}
+function shareBill(type) {
+  const bill=saveBill();
+  if(!bill)return;
+  const text=receiptText(bill);
+  if(type==="whatsapp") {
+    window.open("https://wa.me/91"+bill.phone+"?text="+encodeURIComponent(text),"_blank");
+  } else if(type==="sms") {
+    window.location.href="sms:"+bill.phone+"?body="+encodeURIComponent(text);
+  } else if(type==="email") {
+    const subject="BUBU VARIETY STORE - Bill #"+bill.number;
+    window.location.href="mailto:"+encodeURIComponent(bill.email)+"?subject="+encodeURIComponent(subject)+"&body="+encodeURIComponent(text);
+  }
+}
+$("whatsapp").addEventListener("click",()=>shareBill("whatsapp"));
+$("sms"
